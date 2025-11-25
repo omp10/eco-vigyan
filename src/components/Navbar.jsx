@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
 import { 
   Phone, 
   Mail, 
@@ -23,7 +22,6 @@ export default function Navbar() {
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'About', path: '/#about' }, 
-    { name: 'Programs', path: '/programs' },
     { name: 'Mushroom Map', path: '/map', isNew: true },
   ];
 
@@ -84,7 +82,7 @@ export default function Navbar() {
           <div className="flex justify-between items-center">
             
             {/* Logo */}
-            <Link href="/" className="group flex items-center space-x-2">
+            <a href="/" className="group flex items-center space-x-2">
               <div className="w-10 h-10 bg-gradient-to-br from-green-600 to-emerald-800 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-green-500/30 transition-all duration-300 group-hover:scale-105">
                 <Sprout className="w-6 h-6 text-white" />
               </div>
@@ -96,12 +94,12 @@ export default function Navbar() {
                   School Trust
                 </span>
               </div>
-            </Link>
+            </a>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
               {navLinks.map((link) => (
-                <Link
+                <a
                   key={link.name}
                   href={link.path}
                   className="relative group py-2 text-sm font-bold text-slate-600 hover:text-emerald-700 transition-colors"
@@ -116,11 +114,11 @@ export default function Navbar() {
                   )}
                   {/* Animated Underline */}
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-300 group-hover:w-full"></span>
-                </Link>
+                </a>
               ))}
 
               {/* Donate Button */}
-              <Link
+              <a
                 href="/donate"
                 className="group relative px-6 py-2.5 bg-gradient-to-r from-orange-500 to-red-600 text-white font-bold text-sm rounded-full shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:-translate-y-0.5 transition-all duration-300 overflow-hidden"
               >
@@ -129,7 +127,7 @@ export default function Navbar() {
                 </span>
                 {/* Hover Shine Effect */}
                 <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700" />
-              </Link>
+              </a>
             </div>
 
             {/* Mobile Menu Button */}
@@ -152,22 +150,22 @@ export default function Navbar() {
         >
           <div className="px-4 py-6 space-y-4 flex flex-col items-center">
             {navLinks.map((link) => (
-               <Link
+               <a
                key={link.name}
                href={link.path}
                className="text-lg font-medium text-slate-700 hover:text-emerald-700 w-full text-center py-2 hover:bg-stone-50 rounded-lg transition"
                onClick={() => setIsOpen(false)}
              >
                {link.name}
-             </Link>
+             </a>
             ))}
-            <Link
+            <a
               href="/donate"
               className="w-full text-center px-6 py-3 bg-orange-600 text-white font-bold rounded-lg shadow-md active:scale-95 transition"
               onClick={() => setIsOpen(false)}
             >
               Donate Now
-            </Link>
+            </a>
           </div>
         </div>
       </nav>
