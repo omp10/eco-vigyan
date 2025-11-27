@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { 
   Phone, 
   Mail, 
@@ -16,6 +16,27 @@ import {
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
+  const handleNavClick = useCallback((event, link) => {
+    if (!link.path.startsWith("/#")) return;
+
+    event.preventDefault();
+    const hash = link.path.split("#")[1];
+    if (!hash) return;
+
+    const scrollToSection = () => {
+      const el = document.getElementById(hash);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    };
+
+    if (window.location.pathname !== "/") {
+      window.location.href = link.path;
+    } else {
+      scrollToSection();
+    }
+  }, []);
 
   // Define links in one place to ensure consistency
   // Note: 'About' uses a hash (#about) to scroll to the section on the home page
@@ -102,7 +123,8 @@ export default function Navbar() {
                 <a
                   key={link.name}
                   href={link.path}
-                  className="relative group py-2 text-sm font-bold text-slate-600 hover:text-emerald-700 transition-colors"
+                className="relative group py-2 text-sm font-bold text-slate-600 hover:text-emerald-700 transition-colors"
+                onClick={(event) => handleNavClick(event, link)}
                 >
                   {link.name}
                   {/* Badge for 'New' items */}
@@ -154,7 +176,10 @@ export default function Navbar() {
                key={link.name}
                href={link.path}
                className="text-lg font-medium text-slate-700 hover:text-emerald-700 w-full text-center py-2 hover:bg-stone-50 rounded-lg transition"
-               onClick={() => setIsOpen(false)}
+             onClick={(event) => {
+               handleNavClick(event, link);
+               setIsOpen(false);
+             }}
              >
                {link.name}
              </a>

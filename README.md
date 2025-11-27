@@ -32,10 +32,17 @@ npm run dev
      "category": "Decomposer/ parasitic",
      "contributor": "Prakash",
      "name": "Magic Mushroom",
-     "use": "Edible"
+     "use": "Edible",
+     "image": "https://example.com/mushroom.jpg"
    }
    ```
    Use the same script or Atlas UI to add more records.
+
+### Image uploads
+
+- When contributors add a mushroom from `/map`, they can upload a photo from their device.
+- Images are saved under `public/uploads/` and the document stores the relative path (`/uploads/<file>`). These files are served statically by Next.js.
+- Ensure your deployment target allows writing to the filesystem (e.g., self-hosted or Node server). For serverless platforms without persistent storage, switch to an object store (S3, Cloudinary, etc.) instead.
 
 If MongoDB is unreachable or empty, the API gracefully falls back to the static dataset so the UI continues to function.
 
