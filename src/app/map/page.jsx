@@ -13,6 +13,16 @@ export default function MapPage() {
   const [filters, setFilters] = useState({});
   const [selectedMushroom, setSelectedMushroom] = useState(null); // New State for selection
   const [isMounted, setIsMounted] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    contributor: "",
+    category: "",
+    use: "",
+    latitude: "",
+    longitude: ""
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formStatus, setFormStatus] = useState(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -41,6 +51,55 @@ export default function MapPage() {
   const switchMode = (newMode) => {
     setMode(newMode);
     initializeFilters(data, newMode);
+  };
+
+  const handleFormChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFormSubmit = async (event) => {
+    event.preventDefault();
+    setIsSubmitting(true);
+    setFormStatus(null);
+
+    try {
+      const response = await fetch("/api/mushrooms", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      });
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payload.message || "Failed to save mushroom");
+      }
+
+      setData((prev) => [...prev, payload]);
+      setFilters((prev) => {
+        const activeKey = mode === "category" ? payload.category : payload.use;
+        if (Object.prototype.hasOwnProperty.call(prev, activeKey)) {
+          return prev;
+        }
+        return { ...prev, [activeKey]: true };
+      });
+      setFormStatus({ type: "success", message: "Mushroom added to the map!" });
+      setFormData({
+        name: "",
+        contributor: "",
+        category: "",
+        use: "",
+        latitude: "",
+        longitude: ""
+      });
+    } catch (error) {
+      setFormStatus({
+        type: "error",
+        message: error.message || "Something went wrong"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -200,6 +259,94 @@ export default function MapPage() {
                   toggle={toggleFilter}
                 />
               </div>
+            </div>
+
+            <div className="mt-6 p-4 bg-gray-700/40 border border-gray-600 rounded-xl">
+              <h3 className="text-lg font-bold text-green-400 mb-4">
+                Contribute a Mushroom
+              </h3>
+              <form className="space-y-3" onSubmit={handleFormSubmit}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <input
+                    name="name"
+                    value={formData.name}
+                    onChange={handleFormChange}
+                    placeholder="Name"
+                    className="bg-gray-900/60 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                    required
+                  />
+                  <input
+                    name="contributor"
+                    value={formData.contributor}
+                    onChange={handleFormChange}
+                    placeholder="Contributor"
+                    className="bg-gray-900/60 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <input
+                    name="category"
+                    value={formData.category}
+                    onChange={handleFormChange}
+                    placeholder="Category (e.g., Parasitic)"
+                    className="bg-gray-900/60 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                    required
+                  />
+                  <input
+                    name="use"
+                    value={formData.use}
+                    onChange={handleFormChange}
+                    placeholder="Use (e.g., Edible)"
+                    className="bg-gray-900/60 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <input
+                    name="latitude"
+                    type="number"
+                    step="0.000001"
+                    value={formData.latitude}
+                    onChange={handleFormChange}
+                    placeholder="Latitude"
+                    className="bg-gray-900/60 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                    required
+                  />
+                  <input
+                    name="longitude"
+                    type="number"
+                    step="0.000001"
+                    value={formData.longitude}
+                    onChange={handleFormChange}
+                    placeholder="Longitude"
+                    className="bg-gray-900/60 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                    required
+                  />
+                </div>
+
+                {formStatus && (
+                  <p
+                    className={`text-sm ${
+                      formStatus.type === "success"
+                        ? "text-green-300"
+                        : "text-red-300"
+                    }`}
+                  >
+                    {formStatus.message}
+                  </p>
+                )}
+
+                <button
+                  type="submit"
+                  className="w-full bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg py-2 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Saving..." : "Add to Map"}
+                </button>
+              </form>
             </div>
           </div>
         </div>

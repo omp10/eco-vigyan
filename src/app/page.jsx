@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import FramerAnimation from "@/components/FramerAnimation";
-import AnimatedHeroText from "@/components/AnimatedHeroText"; 
+import AnimatedHeroText from "@/components/AnimatedHeroText"; // Assuming this handles text transition
 import {
   BookOpen,
   Heart,
@@ -81,8 +81,7 @@ export default function HomePage() {
       </section>
 
       {/* --- ABOUT / MISSION --- */}
-      {/* Added id="about" here for the anchor link to work */}
-      <section id="about" className="py-24 bg-stone-50 relative scroll-mt-20">
+      <section className="py-24 bg-stone-50 relative">
         {/* Decorative background blob */}
         <div className="absolute top-0 left-0 w-64 h-64 bg-orange-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
 
