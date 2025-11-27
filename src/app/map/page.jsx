@@ -21,6 +21,7 @@ export default function MapPage() {
     latitude: "",
     longitude: ""
   });
+  const [imageFile, setImageFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formStatus, setFormStatus] = useState(null);
 
@@ -58,16 +59,28 @@ export default function MapPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleImageChange = (event) => {
+    const file = event.target.files?.[0];
+    setImageFile(file || null);
+  };
+
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     setIsSubmitting(true);
     setFormStatus(null);
 
     try {
+      const formPayload = new FormData();
+      Object.entries(formData).forEach(([key, value]) =>
+        formPayload.append(key, value)
+      );
+      if (imageFile) {
+        formPayload.append("image", imageFile);
+      }
+
       const response = await fetch("/api/mushrooms", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
+        body: formPayload
       });
       const payload = await response.json();
 
@@ -90,8 +103,9 @@ export default function MapPage() {
         category: "",
         use: "",
         latitude: "",
-        longitude: ""
+        longitude: "",
       });
+      setImageFile(null);
     } catch (error) {
       setFormStatus({
         type: "error",
@@ -120,6 +134,17 @@ export default function MapPage() {
 
               {selectedMushroom ? (
                 <div className="space-y-3 text-gray-200 animate-in fade-in slide-in-from-left-4 duration-300">
+                  {selectedMushroom.image && (
+                    <div className="relative overflow-hidden rounded-xl border border-gray-600">
+                      <img
+                        src={selectedMushroom.image}
+                        alt={selectedMushroom.name}
+                        className="w-full h-48 object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
+
                   {/* Name */}
                   <h3 className="text-2xl font-bold text-white tracking-wide">
                     {selectedMushroom.name}
@@ -326,6 +351,13 @@ export default function MapPage() {
                     required
                   />
                 </div>
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="bg-gray-900/60 border border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 file:bg-gray-700 file:border-0 file:mr-3 file:px-3 file:py-1 file:rounded-md file:text-sm file:text-white"
+                />
 
                 {formStatus && (
                   <p

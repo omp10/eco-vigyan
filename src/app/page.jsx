@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import FramerAnimation from "@/components/FramerAnimation";
@@ -19,17 +19,18 @@ import {
 } from "lucide-react";
 import Footer from "@/components/Footer";
 
-export default function HomePage() {
+function HeroSection() {
   const heroImages = [
     "/icons/img1.jpg",
     "/icons/img2.jpg",
     "/icons/img3.webp",
   ];
 
-  const [currentImage, setCurrentImage] = useState(0);
+  const [currentImage, setCurrentImage] = React.useState(0);
 
-  // Optional: Auto-cycle background if AnimatedHeroText doesn't drive it exclusively
-  useEffect(() => {
+  // Keep background animation isolated so the rest of the page
+  // does not re-render on each slide change (reduces scroll stutter).
+  React.useEffect(() => {
     const timer = setInterval(() => {
       setCurrentImage((prev) => (prev + 1) % heroImages.length);
     }, 5000);
@@ -37,51 +38,53 @@ export default function HomePage() {
   }, [heroImages.length]);
 
   return (
+    <section className="relative h-[85vh] flex items-center justify-center overflow-hidden will-change-transform">
+      {heroImages.map((img, idx) => (
+        <div
+          key={idx}
+          className={`absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out transform ${
+            idx === currentImage ? "opacity-100 scale-105" : "opacity-0 scale-100"
+          }`}
+          style={{ backgroundImage: `url(${img})` }}
+        />
+      ))}
+
+      <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/80"></div>
+
+      <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
+
+      <div className="relative z-20 container mx-auto px-4 h-full flex flex-col justify-center items-center text-center">
+        <AnimatedHeroText 
+          onTextChange={(index) => setCurrentImage(index % heroImages.length)} 
+        />
+      </div>
+
+      <div className="absolute bottom-10 flex space-x-3 z-30 bg-black/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
+        {heroImages.map((_, idx) => (
+          <button
+            key={idx}
+            onClick={() => setCurrentImage(idx)}
+            className={`h-2 rounded-full transition-all duration-500 ${
+              idx === currentImage ? "w-8 bg-orange-500" : "w-2 bg-white/50 hover:bg-white"
+            }`}
+            aria-label={`Go to slide ${idx + 1}`}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+export default function HomePage() {
+  return (
     <div className="min-h-screen font-sans bg-stone-50 text-slate-800 selection:bg-orange-500 selection:text-white">
       <Navbar />
 
       {/* --- HERO SECTION --- */}
-      <section className="relative h-[85vh] flex items-center justify-center overflow-hidden">
-        {/* Background Slider with Ken Burns Effect */}
-        {heroImages.map((img, idx) => (
-          <div
-            key={idx}
-            className={`absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out transform ${
-              idx === currentImage ? "opacity-100 scale-105" : "opacity-0 scale-100"
-            }`}
-            style={{ backgroundImage: `url(${img})` }}
-          />
-        ))}
-
-        {/* Gradient Overlays for Readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/80"></div>
-        
-        {/* Pattern Overlay */}
-        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
-
-        <div className="relative z-20 container mx-auto px-4 h-full flex flex-col justify-center items-center text-center">
-          <AnimatedHeroText 
-            onTextChange={(index) => setCurrentImage(index % heroImages.length)} 
-          />
-        </div>
-
-        {/* Modern Slider Indicators */}
-        <div className="absolute bottom-10 flex space-x-3 z-30 bg-black/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
-          {heroImages.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => setCurrentImage(idx)}
-              className={`h-2 rounded-full transition-all duration-500 ${
-                idx === currentImage ? "w-8 bg-orange-500" : "w-2 bg-white/50 hover:bg-white"
-              }`}
-              aria-label={`Go to slide ${idx + 1}`}
-            />
-          ))}
-        </div>
-      </section>
+      <HeroSection />
 
       {/* --- ABOUT / MISSION --- */}
-      <section className="py-24 bg-stone-50 relative">
+      <section id="about" className="py-24 bg-stone-50 relative scroll-mt-24">
         {/* Decorative background blob */}
         <div className="absolute top-0 left-0 w-64 h-64 bg-orange-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
 
